@@ -1,6 +1,6 @@
 package by.kev.cloudfilestorage.service;
 
-import by.kev.cloudfilestorage.Util.PathUtil;
+import by.kev.cloudfilestorage.Util.PathUtils;
 import by.kev.cloudfilestorage.config.properties.MinioProperties;
 import by.kev.cloudfilestorage.exception.MinioServiceException;
 import by.kev.cloudfilestorage.exception.ResourceAlreadyExistException;
@@ -67,7 +67,7 @@ public class FolderService extends MinioService {
                 String objectName = result.get().objectName();
 
                 try (InputStream inputStream = getFileStream(objectName)) {
-                    zipOutputStream.putNextEntry(new ZipEntry(PathUtil.getPathWithoutRoot(objectName)));
+                    zipOutputStream.putNextEntry(new ZipEntry(PathUtils.getPathWithoutRoot(objectName)));
                     inputStream.transferTo(zipOutputStream);
                     zipOutputStream.closeEntry();
                 }
@@ -80,7 +80,7 @@ public class FolderService extends MinioService {
     }
 
     public void createRootDirectory(Long userId) {
-        String rootPath = PathUtil.getPathWithRoot("", userId);
+        String rootPath = PathUtils.getPathWithRoot("", userId);
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -94,7 +94,7 @@ public class FolderService extends MinioService {
     }
 
     public ObjectWriteResponse createEmptyDirectory(String path) {
-        String parentPath = PathUtil.getResourcePathWithoutName(path);
+        String parentPath = PathUtils.getResourcePathWithoutName(path);
 
         if (!doesObjectExist(parentPath))
             throw new ResourceNotFoundException("Parent folder doesn't exist");

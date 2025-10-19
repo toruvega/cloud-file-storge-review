@@ -6,7 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
-public class PathUtil {
+public class PathUtils {
 
     public static String getPathWithoutRoot(String path) {
         return StringUtils.substringAfter(path, "/");

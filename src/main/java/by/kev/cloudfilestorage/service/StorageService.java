@@ -1,6 +1,6 @@
 package by.kev.cloudfilestorage.service;
 
-import by.kev.cloudfilestorage.Util.PathUtil;
+import by.kev.cloudfilestorage.Util.PathUtils;
 import by.kev.cloudfilestorage.dto.ResourceResponseDTO;
 import by.kev.cloudfilestorage.exception.ResourceAlreadyExistException;
 import by.kev.cloudfilestorage.exception.ResourceNotFoundException;
@@ -28,7 +28,7 @@ public class StorageService {
 
     public void delete(String path, Long userId) {
         MinioService service = minioServiceFactory.getServiceForPath(path);
-        String fullPath = PathUtil.getPathWithRoot(path, userId);
+        String fullPath = PathUtils.getPathWithRoot(path, userId);
 
         if (!service.doesObjectExist(fullPath)) {
             log.warn("User [{}] tried to delete non-existing resource [{}]", userId, path);
@@ -40,7 +40,7 @@ public class StorageService {
     }
 
     public ResourceResponseDTO createFolder(String path, Long userId) {
-        String fullPath = PathUtil.getPathWithRoot(path, userId);
+        String fullPath = PathUtils.getPathWithRoot(path, userId);
         ObjectWriteResponse response = folderService.createEmptyDirectory(fullPath);
 
         log.info("Folder [{}] created by user [{}]", path, userId);
@@ -48,7 +48,7 @@ public class StorageService {
     }
 
     public List<ResourceResponseDTO> uploadFiles(MultipartFile[] files, String path, Long userId) {
-        String parentPath = PathUtil.getPathWithRoot(path, userId);
+        String parentPath = PathUtils.getPathWithRoot(path, userId);
         List<ResourceResponseDTO> uploaded = new ArrayList<>();
 
         for (MultipartFile file : files) {
@@ -70,8 +70,8 @@ public class StorageService {
 
     public ResourceResponseDTO moveResource(String oldPath, String newPath, Long userId) {
         MinioService service = minioServiceFactory.getServiceForPath(oldPath);
-        String fullOldPath = PathUtil.getPathWithRoot(oldPath, userId);
-        String fullNewPath = PathUtil.getPathWithRoot(newPath, userId);
+        String fullOldPath = PathUtils.getPathWithRoot(oldPath, userId);
+        String fullNewPath = PathUtils.getPathWithRoot(newPath, userId);
 
         if (!service.doesObjectExist(fullOldPath)) {
             log.warn("User [{}] tried to move non-existing resource [{}]", userId, oldPath);
@@ -92,7 +92,7 @@ public class StorageService {
 
     public InputStream download(String path, Long userId) {
         MinioService service = minioServiceFactory.getServiceForPath(path);
-        String fullPath = PathUtil.getPathWithRoot(path, userId);
+        String fullPath = PathUtils.getPathWithRoot(path, userId);
 
         if (!service.doesObjectExist(fullPath)) {
             log.warn("User [{}] tried to download non-existing resource [{}]", userId, path);
@@ -104,7 +104,7 @@ public class StorageService {
 
     public ResourceResponseDTO getResourceMetadata(String path, Long userId) {
         MinioService service = minioServiceFactory.getServiceForPath(path);
-        String fullPath = PathUtil.getPathWithRoot(path, userId);
+        String fullPath = PathUtils.getPathWithRoot(path, userId);
 
         if (!service.doesObjectExist(fullPath)) {
             log.warn("User [{}] requested metadata for non-existing resource [{}]", userId, path);
@@ -116,7 +116,7 @@ public class StorageService {
     }
 
     public List<ResourceResponseDTO> getDirectoryContent(String path, Long userId) {
-        String fullPath = PathUtil.getPathWithRoot(path, userId);
+        String fullPath = PathUtils.getPathWithRoot(path, userId);
 
         if (!folderService.doesObjectExist(fullPath)) {
             log.warn("User [{}] requested content of non-existing folder [{}]", userId, path);
@@ -132,12 +132,12 @@ public class StorageService {
     }
 
     public List<ResourceResponseDTO> searchResources(String query, Long userId) {
-        String rootPath = PathUtil.getPathWithRoot("", userId);
+        String rootPath = PathUtils.getPathWithRoot("", userId);
         List<Item> items = folderService.getDirectoryObjects(rootPath, true);
         List<ResourceResponseDTO> result = new ArrayList<>();
 
         for (Item item : items) {
-            String itemName = PathUtil.getResourceName(item.objectName());
+            String itemName = PathUtils.getResourceName(item.objectName());
 
             if (itemName.contains(query) && !item.objectName().equals(rootPath))
                 result.add(mapper.toResourceResponseDTO(item));

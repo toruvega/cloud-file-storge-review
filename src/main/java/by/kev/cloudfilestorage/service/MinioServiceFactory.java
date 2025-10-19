@@ -1,6 +1,6 @@
 package by.kev.cloudfilestorage.service;
 
-import by.kev.cloudfilestorage.Util.PathUtil;
+import by.kev.cloudfilestorage.Util.PathUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ public class MinioServiceFactory {
     private final FileService fileService;
 
     public MinioService getServiceForPath(String path) {
-        return PathUtil.isFolderPath(path) ? folderService : fileService;
+        return PathUtils.isFolderPath(path) ? folderService : fileService;
     }
 }
 

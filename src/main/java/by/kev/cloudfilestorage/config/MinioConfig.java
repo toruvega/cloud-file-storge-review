@@ -1,16 +1,20 @@
 package by.kev.cloudfilestorage.config;
 
 import by.kev.cloudfilestorage.config.properties.MinioProperties;
+import by.kev.cloudfilestorage.exception.MinioServiceException;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
+@EnableConfigurationProperties({MinioProperties.class})
 public class MinioConfig {
 
     private final MinioProperties minioProperties;
@@ -26,16 +30,21 @@ public class MinioConfig {
         return minioClient;
     }
 
-    @SneakyThrows
     private void createBucket(MinioClient minioClient) {
-        boolean found = minioClient.bucketExists(BucketExistsArgs.builder()
-                .bucket(minioProperties.getBucket())
-                .build());
-
-        if (!found) {
-            minioClient.makeBucket(MakeBucketArgs.builder()
+        try {
+            boolean found = minioClient.bucketExists(BucketExistsArgs.builder()
                     .bucket(minioProperties.getBucket())
                     .build());
+
+            if (!found) {
+                minioClient.makeBucket(MakeBucketArgs.builder()
+                        .bucket(minioProperties.getBucket())
+                        .build());
+            }
+        } catch (Exception e) {
+            log.error("Failed to create bucket '{}'", minioProperties.getBucket(), e);
+            throw new MinioServiceException("Failed to create bucket");
         }
+
     }
 }

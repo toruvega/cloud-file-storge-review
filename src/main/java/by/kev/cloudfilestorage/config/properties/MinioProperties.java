@@ -1,18 +1,21 @@
 package by.kev.cloudfilestorage.config.properties;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
 @Getter
-@Setter
 @ConfigurationProperties(prefix = "minio")
 public class MinioProperties {
 
-    private String bucket;
-    private String url;
-    private String accessKey;
-    private String secretKey;
+    private final String bucket;
+    private final String url;
+    private final String accessKey;
+    private final String secretKey;
+
+    public MinioProperties(String bucket, String url, String accessKey, String secretKey) {
+        this.bucket = bucket;
+        this.url = url;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+    }
 }

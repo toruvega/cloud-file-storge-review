@@ -1,9 +1,11 @@
 package by.kev.cloudfilestorage.config;
 
+import by.kev.cloudfilestorage.config.properties.CorsProperties;
 import by.kev.cloudfilestorage.security.RestAuthenticationEntryPoint;
 import by.kev.cloudfilestorage.service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,12 +20,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableConfigurationProperties({CorsProperties.class})
 public class SecurityConfig {
+
+    private final CorsProperties corsProperties;
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -70,15 +73,7 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(List.of(
-                "http://localhost",
-                "http://localhost:3000",
-                "http://localhost:80",
-                "http://194.87.146.11:3000",
-                "http://194.87.146.11:80",
-                "http://frontend",
-                "http://frontend:80"
-        ));
+        corsConfiguration.setAllowedOrigins(corsProperties.getAllowedOrigins());
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);

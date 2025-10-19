@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth Controller", description = "Auth API")
 public class AuthController {
@@ -30,12 +30,10 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<UserResponseDTO> signIn(@RequestBody @Valid UserRequestDTO userRequestDTO,
+    public UserResponseDTO signIn(@RequestBody @Valid UserRequestDTO userRequestDTO,
                                                   HttpSession session) {
 
-        UserResponseDTO userResponseDTO = authService.login(userRequestDTO, session);
-
-        return ResponseEntity.ok(userResponseDTO);
+        return authService.login(userRequestDTO, session);
     }
 
 
