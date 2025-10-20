@@ -5,7 +5,6 @@ import by.kev.cloudfilestorage.security.RestAuthenticationEntryPoint;
 import by.kev.cloudfilestorage.service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableConfigurationProperties({CorsProperties.class})
 public class SecurityConfig {
 
     private final CorsProperties corsProperties;
@@ -38,8 +36,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/sign-up",
-                                "/api/auth/sign-in",
+                        .requestMatchers("/auth/sign-up",
+                                "/auth/sign-in",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**")

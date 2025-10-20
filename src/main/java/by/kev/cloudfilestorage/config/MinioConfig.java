@@ -7,14 +7,12 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@EnableConfigurationProperties({MinioProperties.class})
 public class MinioConfig {
 
     private final MinioProperties minioProperties;
