@@ -10,12 +10,15 @@ import io.minio.StatObjectResponse;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class StorageService {
     private final MinioServiceFactory minioServiceFactory;
     private final FolderService folderService;
     private final ResourceMapper mapper;
+    private final ThreadPoolTaskExecutor fileUploadExecutor;
 
     public void delete(String path, Long userId) {
         MinioService service = minioServiceFactory.getServiceForPath(path);
@@ -49,23 +53,27 @@ public class StorageService {
 
     public List<ResourceResponseDTO> uploadFiles(MultipartFile[] files, String path, Long userId) {
         String parentPath = PathUtils.getPathWithRoot(path, userId);
-        List<ResourceResponseDTO> uploaded = new ArrayList<>();
 
-        for (MultipartFile file : files) {
-            String fullPath = parentPath + file.getOriginalFilename();
-            MinioService service = minioServiceFactory.getServiceForPath(fullPath);
+        List<CompletableFuture<ResourceResponseDTO>> futures = Arrays.stream(files)
+                .map(file -> CompletableFuture.supplyAsync(() -> {
+                    String fullPath = parentPath + file.getOriginalFilename();
+                    MinioService service = minioServiceFactory.getServiceForPath(fullPath);
 
-            if (service.doesObjectExist(fullPath)) {
-                log.warn("User [{}] tried to upload an existing file [{}]", userId, file.getOriginalFilename());
-                throw new AlreadyExistException("Resource already exists");
-            }
-            ObjectWriteResponse response = service.uploadFile(fullPath, file);
+                    if (service.doesObjectExist(fullPath)) {
+                        log.warn("User [{}] tried to upload an existing file [{}]", userId, file.getOriginalFilename());
+                        throw new AlreadyExistException("Resource already exists");
+                    }
 
-            uploaded.add(mapper.toResourceResponseDTO(response.object(), file.getSize()));
-            log.info("File [{}] ({} bytes) uploaded by user [{}]", file.getOriginalFilename(), file.getSize(), userId);
-        }
+                    ObjectWriteResponse response = service.uploadFile(fullPath, file);
+                    log.info("File [{}] ({} bytes) uploaded by user [{}]", file.getOriginalFilename(), file.getSize(), userId);
 
-        return uploaded;
+                    return mapper.toResourceResponseDTO(response.object(), file.getSize());
+                }, fileUploadExecutor))
+                .toList();
+
+        return futures.stream()
+                .map(CompletableFuture::join)
+                .toList();
     }
 
     public ResourceResponseDTO moveResource(String oldPath, String newPath, Long userId) {

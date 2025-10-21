@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -43,6 +44,16 @@ public class MinioConfig {
             log.error("Failed to create bucket '{}'", minioProperties.getBucket(), e);
             throw new MinioServiceException("Failed to create bucket");
         }
+    }
 
+    @Bean
+    public ThreadPoolTaskExecutor fileUploadExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(20);
+        executor.setThreadNamePrefix("file-upload-");
+        executor.initialize();
+        return executor;
     }
 }
