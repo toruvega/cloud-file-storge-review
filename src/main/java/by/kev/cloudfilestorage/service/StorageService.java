@@ -2,7 +2,7 @@ package by.kev.cloudfilestorage.service;
 
 import by.kev.cloudfilestorage.Util.PathUtils;
 import by.kev.cloudfilestorage.dto.ResourceResponseDTO;
-import by.kev.cloudfilestorage.exception.ResourceAlreadyExistException;
+import by.kev.cloudfilestorage.exception.AlreadyExistException;
 import by.kev.cloudfilestorage.exception.ResourceNotFoundException;
 import by.kev.cloudfilestorage.mapper.ResourceMapper;
 import io.minio.ObjectWriteResponse;
@@ -57,7 +57,7 @@ public class StorageService {
 
             if (service.doesObjectExist(fullPath)) {
                 log.warn("User [{}] tried to upload an existing file [{}]", userId, file.getOriginalFilename());
-                throw new ResourceAlreadyExistException("Resource already exists");
+                throw new AlreadyExistException("Resource already exists");
             }
             ObjectWriteResponse response = service.uploadFile(fullPath, file);
 
@@ -80,7 +80,7 @@ public class StorageService {
 
         if (service.doesObjectExist(fullNewPath)) {
             log.warn("User [{}] tried to overwrite existing resource [{}]", userId, newPath);
-            throw new ResourceAlreadyExistException("Resource already exists: " + newPath);
+            throw new AlreadyExistException("Resource already exists: " + newPath);
         }
 
         StatObjectResponse resourceMetadata = service.getResourceMetadata(fullOldPath);

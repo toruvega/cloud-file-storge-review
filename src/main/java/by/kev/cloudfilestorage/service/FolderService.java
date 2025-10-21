@@ -2,8 +2,8 @@ package by.kev.cloudfilestorage.service;
 
 import by.kev.cloudfilestorage.Util.PathUtils;
 import by.kev.cloudfilestorage.config.properties.MinioProperties;
+import by.kev.cloudfilestorage.exception.AlreadyExistException;
 import by.kev.cloudfilestorage.exception.MinioServiceException;
-import by.kev.cloudfilestorage.exception.ResourceAlreadyExistException;
 import by.kev.cloudfilestorage.exception.ResourceNotFoundException;
 import io.minio.*;
 import io.minio.messages.DeleteObject;
@@ -100,7 +100,7 @@ public class FolderService extends MinioService {
             throw new ResourceNotFoundException("Parent folder doesn't exist");
 
         if (doesObjectExist(path))
-            throw new ResourceAlreadyExistException("Folder already exists");
+            throw new AlreadyExistException("Folder already exists");
 
         try {
             return minioClient.putObject(PutObjectArgs.builder()

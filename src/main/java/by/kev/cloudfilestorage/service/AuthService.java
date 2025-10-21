@@ -2,12 +2,13 @@ package by.kev.cloudfilestorage.service;
 
 import by.kev.cloudfilestorage.dto.UserRequestDTO;
 import by.kev.cloudfilestorage.dto.UserResponseDTO;
-import by.kev.cloudfilestorage.exception.UserExistException;
+import by.kev.cloudfilestorage.exception.AlreadyExistException;
 import by.kev.cloudfilestorage.mapper.UserMapper;
 import by.kev.cloudfilestorage.model.User;
 import by.kev.cloudfilestorage.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -26,13 +28,17 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final FolderService folderService;
 
+    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
+
+
     @Transactional
     public UserResponseDTO register(UserRequestDTO userRequestDTO, HttpSession session) {
         User user = userMapper.toUser(userRequestDTO);
 
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
-            throw new UserExistException("User with username " + user.getUsername() + " already exists.");
-
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            log.warn("User with username [{}] already exists.", user.getUsername());
+            throw new AlreadyExistException("User with username " + user.getUsername() + " already exists.");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -58,6 +64,6 @@ public class AuthService {
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
-        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+        session.setAttribute(SPRING_SECURITY_CONTEXT, context);
     }
 }

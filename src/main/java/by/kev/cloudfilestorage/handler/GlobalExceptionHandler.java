@@ -1,10 +1,9 @@
 package by.kev.cloudfilestorage.handler;
 
 import by.kev.cloudfilestorage.dto.ErrorResponseDTO;
+import by.kev.cloudfilestorage.exception.AlreadyExistException;
 import by.kev.cloudfilestorage.exception.MinioServiceException;
-import by.kev.cloudfilestorage.exception.ResourceAlreadyExistException;
 import by.kev.cloudfilestorage.exception.ResourceNotFoundException;
-import by.kev.cloudfilestorage.exception.UserExistException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,8 +18,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserExistException.class)
-    public ResponseEntity<ErrorResponseDTO> handleUserExistException(UserExistException e) {
+    @ExceptionHandler(AlreadyExistException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAlreadyExistException(AlreadyExistException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO(e.getMessage()));
     }
 
@@ -49,11 +48,6 @@ public class GlobalExceptionHandler {
                 .orElse("Validation error");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO(message));
-    }
-
-    @ExceptionHandler(ResourceAlreadyExistException.class)
-    public ResponseEntity<ErrorResponseDTO> handleResourceAlreadyExistException(ResourceAlreadyExistException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponseDTO(e.getMessage()));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

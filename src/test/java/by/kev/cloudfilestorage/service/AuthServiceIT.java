@@ -2,7 +2,7 @@ package by.kev.cloudfilestorage.service;
 
 import by.kev.cloudfilestorage.dto.UserRequestDTO;
 import by.kev.cloudfilestorage.dto.UserResponseDTO;
-import by.kev.cloudfilestorage.exception.UserExistException;
+import by.kev.cloudfilestorage.exception.AlreadyExistException;
 import by.kev.cloudfilestorage.repository.UserRepository;
 import io.minio.MinioClient;
 import org.junit.jupiter.api.DisplayName;
@@ -73,14 +73,14 @@ public class AuthServiceIT {
     }
 
     @Test
-    @DisplayName("Test register with throws UserExistException")
-    public void testRegister_ExistingUser_ThrowsUserExistException() {
+    @DisplayName("Test register with throws AlreadyExistException")
+    public void testRegister_ExistingUser_ThrowsAlreadyExistException() {
         UserRequestDTO userRequestDTO = new UserRequestDTO("test_username", "test_password");
         MockHttpSession session = new MockHttpSession();
 
         authService.register(userRequestDTO, session);
 
-        assertThrows(UserExistException.class, () -> authService.register(userRequestDTO, session));
+        assertThrows(AlreadyExistException.class, () -> authService.register(userRequestDTO, session));
     }
 
 }
