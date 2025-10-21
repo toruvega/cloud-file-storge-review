@@ -3,6 +3,7 @@ package by.kev.cloudfilestorage.controller;
 import by.kev.cloudfilestorage.Util.DownloadResponseBuilder;
 import by.kev.cloudfilestorage.controller.api.ResourceControllerApi;
 import by.kev.cloudfilestorage.dto.ResourceResponseDTO;
+import by.kev.cloudfilestorage.exception.BadRequestException;
 import by.kev.cloudfilestorage.security.UserDetailsImpl;
 import by.kev.cloudfilestorage.service.StorageService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,9 @@ public class ResourceController implements ResourceControllerApi {
     public List<ResourceResponseDTO> uploadResource(@RequestPart(name = "object") MultipartFile[] files,
                                                     @RequestParam(name = "path") String path,
                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        if (files.length > 10)
+            throw new BadRequestException("Too many files (max 10)");
 
         return storageService.uploadFiles(files, path, userDetails.getUser().getId());
     }

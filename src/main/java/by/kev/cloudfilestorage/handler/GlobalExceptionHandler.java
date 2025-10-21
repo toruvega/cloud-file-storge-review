@@ -2,6 +2,7 @@ package by.kev.cloudfilestorage.handler;
 
 import by.kev.cloudfilestorage.dto.ErrorResponseDTO;
 import by.kev.cloudfilestorage.exception.AlreadyExistException;
+import by.kev.cloudfilestorage.exception.BadRequestException;
 import by.kev.cloudfilestorage.exception.MinioServiceException;
 import by.kev.cloudfilestorage.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolation;
@@ -65,6 +66,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponseDTO("Uploaded file exceeds the maximum allowed size"));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponseDTO(e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
