@@ -1,4 +1,4 @@
-package by.kev.cloudfilestorage.controller;
+package by.kev.cloudfilestorage.controller.api;
 
 import by.kev.cloudfilestorage.dto.ErrorResponseDTO;
 import by.kev.cloudfilestorage.dto.ResourceResponseDTO;

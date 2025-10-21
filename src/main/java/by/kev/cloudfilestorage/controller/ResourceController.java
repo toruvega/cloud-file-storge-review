@@ -1,12 +1,15 @@
 package by.kev.cloudfilestorage.controller;
 
-import by.kev.cloudfilestorage.Util.PathUtils;
+import by.kev.cloudfilestorage.Util.DownloadResponseBuilder;
+import by.kev.cloudfilestorage.controller.api.ResourceControllerApi;
 import by.kev.cloudfilestorage.dto.ResourceResponseDTO;
 import by.kev.cloudfilestorage.security.UserDetailsImpl;
 import by.kev.cloudfilestorage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +23,7 @@ import java.util.List;
 public class ResourceController implements ResourceControllerApi {
 
     private final StorageService storageService;
+    private final DownloadResponseBuilder downloadResponseBuilder;
 
     @Override
     @GetMapping
@@ -34,17 +38,9 @@ public class ResourceController implements ResourceControllerApi {
     public ResponseEntity<InputStreamResource> downloadResource(@RequestParam(name = "path") String path,
                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename(PathUtils.getResourceName(path))
-                .build());
-
         InputStream resource = storageService.download(path, userDetails.getUser().getId());
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new InputStreamResource(resource));
+        return downloadResponseBuilder.build(path, resource);
     }
 
     @Override
