@@ -1,10 +1,10 @@
 package by.kev.cloudfilestorage.security;
 
 import by.kev.cloudfilestorage.model.User;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
     private final User user;
@@ -14,8 +14,10 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+    public Collection<RoleGrantedAuthority> getAuthorities() {
+        return user.getRoles().stream()
+                .map(role -> new RoleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
     }
 
     @Override

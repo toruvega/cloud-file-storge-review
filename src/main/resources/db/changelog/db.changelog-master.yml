@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - include:
+      file: changesets/1-create-users.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changesets/2-create-roles.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changesets/3-create-user-roles.yml
+      relativeToChangelogFile: true
+  - include:
+      file: changesets/4-insert-initial-data.yml
+      relativeToChangelogFile: true
+
